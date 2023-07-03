@@ -2,12 +2,58 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.0'
 	id 'io.spring.dependency-management' version '1.1.0'
+	id "org.sonarqube" version "4.0.0.2929"
+	id 'jacoco'
+	
+	//id 'pmd'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
+sonarqube {
 
+properties {
+
+property ('sonar.host.url', 'http://localhost:9000')
+
+property ('sonar.token', 'sqa_206042cdd1f3f61517caa363478bd35cc7db7cc0')
+
+ 
+
+}
+
+}
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport 
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    //reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+   dependsOn test
+    reports {
+        xml.required = true
+        //csv.required = false
+        //html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification{
+  violationRules{
+   rule{
+     enabled=true
+     limit{
+      minimum=0.25
+      }
+   }
+  }
+}  
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -23,6 +69,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
 //implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'org.springframework.boot:spring-boot-starter-validation'
 implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -44,3 +91,4 @@ testImplementation 'org.springframework.boot:spring-boot-starter-test'
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
